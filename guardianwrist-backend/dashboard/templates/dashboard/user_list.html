@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="flex justify-between items-center mb-4">
+    <h1 class="text-2xl font-bold">Users</h1>
+    <form method="get" class="flex gap-2">
+        <input type="text" name="search" value="{{ search }}" placeholder="Search by email or name" class="border rounded px-3 py-1">
+        <button type="submit" class="bg-blue-500 text-white px-4 py-1 rounded">Search</button>
+    </form>
+</div>
+<div class="bg-white rounded shadow overflow-hidden">
+    <table class="min-w-full">
+        <thead class="bg-gray-50">
+            <tr>
+                <th>Email</th>
+                <th>Display Name</th>
+                <th>Premium</th>
+                <th>Joined</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in page_obj %}
+            <tr class="border-t">
+                <td class="px-6 py-4">{{ user.email }}</td>
+                <td class="px-6 py-4">{{ user.displayName|default:"-" }}</td>
+                <td class="px-6 py-4">{{ user.premium|yesno:"Yes,No" }}</td>
+                <td class="px-6 py-4">{{ user.createdAt|slice:":10" }}</td>
+                <td class="px-6 py-4"><a href="{% url 'dashboard:user_detail' user.id %}" class="text-blue-600">View</a></td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="5" class="text-center py-4">No users found.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+<div class="mt-4">
+    {% if page_obj.has_previous %}
+        <a href="?page=1&search={{ search }}">&laquo; first</a>
+        <a href="?page={{ page_obj.previous_page_number }}&search={{ search }}">previous</a>
+    {% endif %}
+    Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+    {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}&search={{ search }}">next</a>
+        <a href="?page={{ page_obj.paginator.num_pages }}&search={{ search }}">last &raquo;</a>
+    {% endif %}
+</div>
+{% endblock %}

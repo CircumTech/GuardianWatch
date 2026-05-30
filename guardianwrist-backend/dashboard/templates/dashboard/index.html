@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+    <div class="bg-white p-6 rounded shadow">
+        <h3 class="text-gray-500">Total Users</h3>
+        <p class="text-3xl font-bold">{{ total_users }}</p>
+    </div>
+    <div class="bg-white p-6 rounded shadow">
+        <h3 class="text-gray-500">Premium Users</h3>
+        <p class="text-3xl font-bold">{{ premium_users }}</p>
+    </div>
+    <div class="bg-white p-6 rounded shadow">
+        <h3 class="text-gray-500">Health Records (sample)</h3>
+        <p class="text-3xl font-bold">{{ total_health_records }}</p>
+    </div>
+</div>
+<h2 class="text-xl font-semibold mb-4">Recent Users</h2>
+<div class="bg-white rounded shadow overflow-hidden">
+    <table class="min-w-full">
+        <thead class="bg-gray-50">
+            <table>
+                <th class="px-6 py-3 text-left">Email</th>
+                <th class="px-6 py-3 text-left">Premium</th>
+                <th class="px-6 py-3 text-left">Joined</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in recent_users %}
+            <tr class="border-t">
+                <td class="px-6 py-4"><a href="{% url 'dashboard:user_detail' user.id %}" class="text-blue-600">{{ user.to_dict.email }}</a></td>
+                <td class="px-6 py-4">{{ user.to_dict.premium|yesno:"Yes,No" }}</td>
+                <td class="px-6 py-4">{{ user.to_dict.createdAt|default:"-" }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

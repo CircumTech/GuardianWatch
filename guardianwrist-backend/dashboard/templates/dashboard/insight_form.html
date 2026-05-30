@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="max-w-2xl mx-auto">
+    <h1 class="text-2xl font-bold mb-4">Create Insight for User</h1>
+    <form method="post" class="bg-white p-6 rounded shadow">
+        {% csrf_token %}
+        <div class="mb-4">
+            <label class="block font-semibold">Title</label>
+            <input type="text" name="title" required class="w-full border rounded px-3 py-2">
+        </div>
+        <div class="mb-4">
+            <label class="block font-semibold">Summary</label>
+            <textarea name="summary" rows="2" class="w-full border rounded px-3 py-2"></textarea>
+        </div>
+        <div class="mb-4">
+            <label class="block font-semibold">Detail</label>
+            <textarea name="detail" rows="4" class="w-full border rounded px-3 py-2"></textarea>
+        </div>
+        <div class="mb-4">
+            <label class="block font-semibold">Severity</label>
+            <select name="severity" class="w-full border rounded px-3 py-2">
+                <option>normal</option><option>caution</option><option>warning</option><option>critical</option>
+            </select>
+        </div>
+        <div class="mb-4">
+            <label><input type="checkbox" name="is_premium"> Is Premium</label>
+        </div>
+        <div class="mb-4">
+            <label class="block font-semibold">Recommendation (optional)</label>
+            <textarea name="recommendation" rows="2" class="w-full border rounded px-3 py-2"></textarea>
+        </div>
+        <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded">Create Insight</button>
+        <a href="{% url 'dashboard:user_detail' user_id %}" class="ml-2 text-gray-600">Cancel</a>
+    </form>
+</div>
+{% endblock %}

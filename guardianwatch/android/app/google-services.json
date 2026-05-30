@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "121147775704",
+    "project_id": "guardianwatch-4c902",
+    "storage_bucket": "guardianwatch-4c902.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:121147775704:android:d5934b3b44aeb1c237d5ad",
+        "android_client_info": {
+          "package_name": "com.circum.guardianwatch"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "121147775704-nde54l7ef1lrqi2u9r135m9bbbgbjm3r.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA-RhvsKyMauqha_GqFQDuvCPBPcEQx-JU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "121147775704-9q0f0i9v2bnjk7me0ahhrb5sop25k872.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "121147775704-dop1111am0ha7he64gp0vadh89s52v3p.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.circum.guardianwatch"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

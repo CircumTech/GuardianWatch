@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="flex justify-between items-center mb-4">
+    <h1 class="text-2xl font-bold">User: {{ user.email }}</h1>
+    <a href="{% url 'dashboard:user_list' %}" class="text-gray-600">← Back</a>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+    <div class="bg-white p-4 rounded shadow">
+        <h2 class="font-semibold mb-2">Profile</h2>
+        <p><strong>ID:</strong> {{ user.id }}</p>
+        <p><strong>Display Name:</strong> {{ user.displayName|default:"-" }}</p>
+        <p><strong>Premium:</strong> {{ user.premium|yesno:"Yes,No" }}</p>
+        <p><strong>Premium Expiry:</strong> {{ user.premiumExpiry|default:"-" }}</p>
+    </div>
+    <div class="bg-white p-4 rounded shadow">
+        <h2 class="font-semibold mb-2">Actions</h2>
+        <a href="{% url 'dashboard:create_insight' user.id %}" class="bg-green-500 text-white px-3 py-1 rounded">Add Insight</a>
+    </div>
+</div>
+
+<h2 class="text-xl font-semibold mb-2">Health Records</h2>
+<div class="bg-white rounded shadow overflow-x-auto mb-8">
+    <table class="min-w-full">
+        <thead class="bg-gray-50">
+            <tr><th>Date</th><th>Heart Rate</th><th>SpO₂</th><th>Temperature</th></tr>
+        </thead>
+        <tbody>
+            {% for rec in health_records %}
+            <tr class="border-t"><td class="px-4 py-2">{{ rec.recorded_at|slice:":19" }}</td><td>{{ rec.heart_rate }}</td><td>{{ rec.spo2 }}</td><td>{{ rec.temperature }}</td></tr>
+            {% empty %}<tr><td colspan="4" class="text-center py-4">No records</td></tr>{% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<h2 class="text-xl font-semibold mb-2">Insights</h2>
+<div class="bg-white rounded shadow overflow-x-auto">
+    <table class="min-w-full">
+        <thead class="bg-gray-50"><tr><th>Title</th><th>Severity</th><th>Premium</th><th>Generated</th><th></th></tr></thead>
+        <tbody>
+            {% for ins in insights %}
+            <tr class="border-t">
+                <td class="px-4 py-2">{{ ins.title }}</td>
+                <td class="px-4 py-2">{{ ins.severity }}</td>
+                <td class="px-4 py-2">{{ ins.is_premium|yesno:"Yes,No" }}</td>
+                <td class="px-4 py-2">{{ ins.generated_at|slice:":10" }}</td>
+                <td><a href="{% url 'dashboard:delete_insight' user.id ins.id %}" class="text-red-600" onclick="return confirm('Delete this insight?')">Delete</a></td>
+            </tr>
+            {% empty %}<tr><td colspan="5" class="text-center py-4">No insights</td></tr>{% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
