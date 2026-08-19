@@ -1,0 +1,41 @@
+# ── Web framework ────────────────────────────────────────────────────────
+fastapi>=0.115.0
+uvicorn[standard]>=0.32.0
+pydantic>=2.9.0
+pydantic-settings>=2.5.0
+python-multipart>=0.0.12
+
+# ── Database ─────────────────────────────────────────────────────────────
+sqlalchemy>=2.0.35
+asyncpg>=0.29.0           # PostgreSQL (production)
+aiosqlite>=0.20.0         # SQLite (local dev — zero setup)
+alembic>=1.13.0
+
+# ── Auth ─────────────────────────────────────────────────────────────────
+firebase-admin>=6.5.0
+PyJWT>=2.9.0
+
+# ── Rate limiting ────────────────────────────────────────────────────────
+slowapi>=0.1.9
+
+# ── ML / model serving ───────────────────────────────────────────────────
+numpy>=1.26.0
+scipy>=1.13.0
+scikit-learn>=1.3.0       # loads the bundled stress/fatigue/fever .pkl files;
+                           # first load logs a one-line sklearn
+                           # InconsistentVersionWarning (pickled under 1.8.0) —
+                           # informational only, predictions are unaffected
+                           # (verified). Pinning to ==1.8.0 removes that line
+                           # but throws hundreds of numpy 2.5 deprecation
+                           # warnings instead — worse trade, so left unpinned.
+xgboost>=2.0.0            # only exercised once sleep_apnea_model.pkl is trained + added
+joblib>=1.3.0
+ai-edge-litert>=1.2.0     # lightweight TFLite runtime for afib_detection.tflite
+
+# ── IAP receipt verification ─────────────────────────────────────────────
+httpx>=0.27.0
+google-auth>=2.34.0       # Google Play Developer API (service-account signing)
+
+# ── Dev / test ───────────────────────────────────────────────────────────
+pytest>=8.3.0
+pytest-asyncio>=0.24.0
