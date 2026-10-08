@@ -1,0 +1,35 @@
+<mxfile host="Electron" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/29.6.6 Chrome/144.0.7559.236 Electron/40.8.4 Safari/537.36" version="29.6.6">
+  <diagram name="Page-1" id="kLuL2du0iVUGnU1ou6cQ">
+    <mxGraphModel dx="786" dy="516" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="P5zbKVJcOyXm7HTr-s3o-3" parent="1" style="rounded=1;arcSize=10;whiteSpace=wrap;html=1;align=center;" value="Website" vertex="1">
+          <mxGeometry height="40" width="100" x="190" y="100" as="geometry" />
+        </mxCell>
+        <mxCell id="P5zbKVJcOyXm7HTr-s3o-5" parent="1" style="align=right;verticalAlign=top;spacingRight=2;whiteSpace=wrap;html=1;" value="0..1" vertex="1">
+          <mxGeometry height="310" width="120" x="400" y="430" as="geometry" />
+        </mxCell>
+        <mxCell id="P5zbKVJcOyXm7HTr-s3o-6" parent="P5zbKVJcOyXm7HTr-s3o-5" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;resizeWidth=1;whiteSpace=wrap;" value="Has an RTOS&lt;div&gt;Collects data via ECG, PPG and Temperature Sensors&lt;/div&gt;&lt;div&gt;Stores a limited quantity of health data&lt;/div&gt;&lt;div&gt;Relays these health data to the mobile app on demand&lt;/div&gt;&lt;div&gt;Has a battery and charger&lt;/div&gt;&lt;div&gt;Has a USB port C and the 3 electrode with the jack port&lt;/div&gt;&lt;div&gt;Alerts users on the health insights&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="282" relative="1" width="120" y="1" as="geometry">
+            <mxPoint y="-282" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="P5zbKVJcOyXm7HTr-s3o-7" parent="1" style="sketch=0;outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#7AA116;strokeColor=none;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=12;fontStyle=0;aspect=fixed;pointerEvents=1;shape=mxgraph.aws4.iot_thing_freertos_device;" value="Device" vertex="1">
+          <mxGeometry height="78" width="78" x="370" y="220" as="geometry" />
+        </mxCell>
+        <mxCell id="P5zbKVJcOyXm7HTr-s3o-10" parent="1" style="image;aspect=fixed;perimeter=ellipsePerimeter;html=1;align=center;shadow=0;dashed=0;fontColor=#4277BB;labelBackgroundColor=default;fontSize=12;spacingTop=3;image=img/lib/ibm/applications/mobile_app.svg;" value="Mobile App" vertex="1">
+          <mxGeometry height="60" width="60" x="510" y="100" as="geometry" />
+        </mxCell>
+        <mxCell id="P5zbKVJcOyXm7HTr-s3o-11" parent="1" style="align=right;verticalAlign=top;spacingRight=2;whiteSpace=wrap;html=1;" value="0..1" vertex="1">
+          <mxGeometry height="360" width="120" x="640" y="100" as="geometry" />
+        </mxCell>
+        <mxCell id="P5zbKVJcOyXm7HTr-s3o-12" parent="P5zbKVJcOyXm7HTr-s3o-11" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;resizeWidth=1;whiteSpace=wrap;" value="&lt;div&gt;Works on both Android and iOS devices&lt;/div&gt;&lt;div&gt;Retrieves health data from the device via Bluetooth&lt;/div&gt;&lt;div&gt;Stores more quantity of health data&lt;/div&gt;&lt;div&gt;Relays these health data to the cloud on demand&lt;/div&gt;&lt;div&gt;Provide insights on the health data based on payment plans&lt;/div&gt;&lt;div&gt;Monitor Live ECG data&lt;/div&gt;&lt;div&gt;Creates User Account&lt;/div&gt;" vertex="1">
+          <mxGeometry height="329" relative="1" width="120" y="1" as="geometry">
+            <mxPoint y="-333" as="offset" />
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
