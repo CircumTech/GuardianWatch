@@ -1,0 +1,7 @@
+{
+  "input_length": 2500,
+  "sampling_rate": 250,
+  "duration_seconds": 10,
+  "accuracy": 1.0,
+  "auc": 1.0
+}
