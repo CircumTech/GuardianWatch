@@ -1,0 +1,45 @@
+# Local dev convenience: `docker compose up` gets you the API + a real
+# Postgres instance (closer to production than the SQLite default).
+# For just iterating on code with zero setup, skip this entirely and run
+# `uvicorn app.main:app --reload` directly — it'll use the SQLite default
+# in config.py with no docker/Postgres involved at all.
+
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: guardianwrist
+      POSTGRES_PASSWORD: guardianwrist_dev
+      POSTGRES_DB: guardianwrist
+    ports:
+      - "5432:5432"
+    volumes:
+      - guardianwrist_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U guardianwrist"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      ENV: development
+      DATABASE_URL: postgresql+asyncpg://guardianwrist:guardianwrist_dev@db:5432/guardianwrist
+      JWT_SECRET_KEY: local-dev-secret-change-me
+      FIREBASE_PROJECT_ID: guardianwatch-b1972
+      # Mount a real service-account key to exercise actual Firebase auth
+      # locally (see .env.example) — without it, /auth/token will fail
+      # since there are no Application Default Credentials inside the
+      # container by default.
+      # FIREBASE_CREDENTIALS_PATH: /app/firebase-service-account.json
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ./app:/app/app  # live-reload-friendly for local iteration
+
+volumes:
+  guardianwrist_pgdata:

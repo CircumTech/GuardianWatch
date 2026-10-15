@@ -1,0 +1,223 @@
+Folder PATH listing
+Volume serial number is 0E21-CD28
+C:.
+¦   .env.example
+¦   alembic.ini
+¦   docker-compose.yml
+¦   docker-entrypoint.sh
+¦   Dockerfile
+¦   guardianwrist.db
+¦   pytest.ini
+¦   README.md
+¦   render.yaml
+¦   requirements.txt
+¦   tree.txt
+¦   
++---.pytest_cache
+¦   ¦   .gitignore
+¦   ¦   CACHEDIR.TAG
+¦   ¦   README.md
+¦   ¦   
+¦   +---v
+¦       +---cache
+¦               lastfailed
+¦               nodeids
+¦               
++---alembic
+¦   ¦   env.py
+¦   ¦   script.py.mako
+¦   ¦   
+¦   +---versions
+¦           071ab0e56fa3_initial_schema.py
+¦           2a3edde9b92e_add_products_devices_orders_admin_auth_.py
+¦           
++---app
+¦   ¦   config.py
+¦   ¦   database.py
+¦   ¦   dependencies.py
+¦   ¦   main.py
+¦   ¦   rate_limit.py
+¦   ¦   security.py
+¦   ¦   
+¦   +---ml
+¦   ¦   ¦   afib.py
+¦   ¦   ¦   fatigue.py
+¦   ¦   ¦   fever.py
+¦   ¦   ¦   hrv_stress.py
+¦   ¦   ¦   model_registry.py
+¦   ¦   ¦   sleep_apnea.py
+¦   ¦   ¦   __init__.py
+¦   ¦   ¦   
+¦   ¦   +---__pycache__
+¦   ¦           afib.cpython-312.pyc
+¦   ¦           fatigue.cpython-312.pyc
+¦   ¦           fever.cpython-312.pyc
+¦   ¦           hrv_stress.cpython-312.pyc
+¦   ¦           model_registry.cpython-312.pyc
+¦   ¦           sleep_apnea.cpython-312.pyc
+¦   ¦           __init__.cpython-312.pyc
+¦   ¦           
+¦   +---models
+¦   ¦   ¦   admin_audit_log.py
+¦   ¦   ¦   admin_user.py
+¦   ¦   ¦   device.py
+¦   ¦   ¦   insight.py
+¦   ¦   ¦   order.py
+¦   ¦   ¦   product.py
+¦   ¦   ¦   reading.py
+¦   ¦   ¦   subscription.py
+¦   ¦   ¦   user.py
+¦   ¦   ¦   __init__.py
+¦   ¦   ¦   
+¦   ¦   +---__pycache__
+¦   ¦           admin_audit_log.cpython-312.pyc
+¦   ¦           admin_user.cpython-312.pyc
+¦   ¦           device.cpython-312.pyc
+¦   ¦           insight.cpython-312.pyc
+¦   ¦           order.cpython-312.pyc
+¦   ¦           product.cpython-312.pyc
+¦   ¦           reading.cpython-312.pyc
+¦   ¦           subscription.cpython-312.pyc
+¦   ¦           user.cpython-312.pyc
+¦   ¦           __init__.cpython-312.pyc
+¦   ¦           
+¦   +---models_store
+¦   ¦       afib_detection.tflite
+¦   ¦       afib_metadata.json
+¦   ¦       fatigue_model.pkl
+¦   ¦       fever_detector.pkl
+¦   ¦       stress_model.pkl
+¦   ¦       
+¦   +---routers
+¦   ¦   ¦   admin_auth.py
+¦   ¦   ¦   admin_dashboard.py
+¦   ¦   ¦   admin_devices.py
+¦   ¦   ¦   admin_orders.py
+¦   ¦   ¦   admin_products.py
+¦   ¦   ¦   auth.py
+¦   ¦   ¦   devices.py
+¦   ¦   ¦   ecg.py
+¦   ¦   ¦   health.py
+¦   ¦   ¦   insights.py
+¦   ¦   ¦   orders.py
+¦   ¦   ¦   products.py
+¦   ¦   ¦   readings.py
+¦   ¦   ¦   subscription.py
+¦   ¦   ¦   users.py
+¦   ¦   ¦   webhooks.py
+¦   ¦   ¦   __init__.py
+¦   ¦   ¦   
+¦   ¦   +---__pycache__
+¦   ¦           admin_auth.cpython-312.pyc
+¦   ¦           admin_dashboard.cpython-312.pyc
+¦   ¦           admin_devices.cpython-312.pyc
+¦   ¦           admin_orders.cpython-312.pyc
+¦   ¦           admin_products.cpython-312.pyc
+¦   ¦           auth.cpython-312.pyc
+¦   ¦           devices.cpython-312.pyc
+¦   ¦           ecg.cpython-312.pyc
+¦   ¦           health.cpython-312.pyc
+¦   ¦           insights.cpython-312.pyc
+¦   ¦           orders.cpython-312.pyc
+¦   ¦           products.cpython-312.pyc
+¦   ¦           readings.cpython-312.pyc
+¦   ¦           subscription.cpython-312.pyc
+¦   ¦           users.cpython-312.pyc
+¦   ¦           webhooks.cpython-312.pyc
+¦   ¦           __init__.cpython-312.pyc
+¦   ¦           
+¦   +---schemas
+¦   ¦   ¦   admin.py
+¦   ¦   ¦   auth.py
+¦   ¦   ¦   device.py
+¦   ¦   ¦   health_metrics.py
+¦   ¦   ¦   insight.py
+¦   ¦   ¦   order.py
+¦   ¦   ¦   product.py
+¦   ¦   ¦   reading.py
+¦   ¦   ¦   subscription.py
+¦   ¦   ¦   user.py
+¦   ¦   ¦   __init__.py
+¦   ¦   ¦   
+¦   ¦   +---__pycache__
+¦   ¦           admin.cpython-312.pyc
+¦   ¦           auth.cpython-312.pyc
+¦   ¦           device.cpython-312.pyc
+¦   ¦           health_metrics.cpython-312.pyc
+¦   ¦           insight.cpython-312.pyc
+¦   ¦           order.cpython-312.pyc
+¦   ¦           product.cpython-312.pyc
+¦   ¦           reading.cpython-312.pyc
+¦   ¦           subscription.cpython-312.pyc
+¦   ¦           user.cpython-312.pyc
+¦   ¦           __init__.cpython-312.pyc
+¦   ¦           
+¦   +---services
+¦   ¦   ¦   admin_audit_service.py
+¦   ¦   ¦   auth_service.py
+¦   ¦   ¦   insight_service.py
+¦   ¦   ¦   order_service.py
+¦   ¦   ¦   payment_service.py
+¦   ¦   ¦   reading_service.py
+¦   ¦   ¦   receipt_service.py
+¦   ¦   ¦   __init__.py
+¦   ¦   ¦   
+¦   ¦   +---__pycache__
+¦   ¦           admin_audit_service.cpython-312.pyc
+¦   ¦           auth_service.cpython-312.pyc
+¦   ¦           insight_service.cpython-312.pyc
+¦   ¦           order_service.cpython-312.pyc
+¦   ¦           payment_service.cpython-312.pyc
+¦   ¦           reading_service.cpython-312.pyc
+¦   ¦           receipt_service.cpython-312.pyc
+¦   ¦           __init__.cpython-312.pyc
+¦   ¦           
+¦   +---utils
+¦   ¦   ¦   db_types.py
+¦   ¦   ¦   device_id.py
+¦   ¦   ¦   __init__.py
+¦   ¦   ¦   
+¦   ¦   +---__pycache__
+¦   ¦           db_types.cpython-312.pyc
+¦   ¦           device_id.cpython-312.pyc
+¦   ¦           __init__.cpython-312.pyc
+¦   ¦           
+¦   +---__pycache__
+¦           config.cpython-312.pyc
+¦           database.cpython-312.pyc
+¦           dependencies.cpython-312.pyc
+¦           main.cpython-312.pyc
+¦           rate_limit.cpython-312.pyc
+¦           security.cpython-312.pyc
+¦           
++---scripts
+¦       create_admin.py
+¦       seed_dev_data.py
+¦       seed_shop_data.py
+¦       
++---tests
+    ¦   conftest.py
+    ¦   test_admin.py
+    ¦   test_api_integration.py
+    ¦   test_ml_afib.py
+    ¦   test_ml_fatigue.py
+    ¦   test_ml_fever.py
+    ¦   test_ml_hrv_stress.py
+    ¦   test_ml_sleep_apnea.py
+    ¦   test_payments.py
+    ¦   test_reading_coalescing.py
+    ¦   test_shop.py
+    ¦   
+    +---__pycache__
+            conftest.cpython-312-pytest-9.1.1.pyc
+            test_admin.cpython-312-pytest-9.1.1.pyc
+            test_api_integration.cpython-312-pytest-9.1.1.pyc
+            test_ml_afib.cpython-312-pytest-9.1.1.pyc
+            test_ml_fatigue.cpython-312-pytest-9.1.1.pyc
+            test_ml_fever.cpython-312-pytest-9.1.1.pyc
+            test_ml_hrv_stress.cpython-312-pytest-9.1.1.pyc
+            test_ml_sleep_apnea.cpython-312-pytest-9.1.1.pyc
+            test_payments.cpython-312-pytest-9.1.1.pyc
+            test_reading_coalescing.cpython-312-pytest-9.1.1.pyc
+            test_shop.cpython-312-pytest-9.1.1.pyc
+            

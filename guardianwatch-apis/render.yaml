@@ -1,0 +1,55 @@
+# Render Blueprint — https://render.com/docs/blueprint-spec
+#
+# Deploy: connect this repo in the Render dashboard and it picks this up
+# automatically ("New +" → "Blueprint"), or run `render blueprint launch`
+# with the Render CLI. Creates the API as a Docker web service plus a
+# managed Postgres database, wired together.
+#
+# Anything marked `sync: false` is a secret Render will prompt for once
+# and store encrypted — never put a real value for those directly in this
+# file, since it's meant to be committed.
+
+databases:
+  - name: guardianwrist-db
+    plan: starter
+    databaseName: guardianwrist
+    user: guardianwrist
+
+services:
+  - type: web
+    name: guardianwrist-api
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    plan: starter
+    healthCheckPath: /readyz
+    buildCommand: docker build -t guardianwrist-api .
+    startCommand: docker run -p 10000:10000 guardianwrist-api
+    envVars:
+      - key: ENV
+        value: production
+      - key: DATABASE_URL
+        fromDatabase:
+          name: guardianwrist-db
+          property: connectionString
+      - key: JWT_SECRET_KEY
+        generateValue: true
+      - key: ADMIN_JWT_SECRET_KEY
+        generateValue: true
+      - key: FIREBASE_PROJECT_ID
+        value: guardianwatch-b1972
+      - key: FIREBASE_CREDENTIALS_PATH
+        sync: false  # paste the service-account JSON's contents into a
+        # Render Secret File instead (Render dashboard → Environment →
+        # Secret Files), then set this to that file's mount path.
+      - key: STRIPE_SECRET_KEY
+        sync: false
+      - key: STRIPE_WEBHOOK_SECRET
+        sync: false
+      - key: FRONTEND_URL
+        sync: false  # the deployed company-site URL, once known
+      - key: CORS_ORIGINS
+        sync: false  # e.g. ["https://circum.com","https://admin.circum.com"]
+      - key: GOOGLE_PLAY_SERVICE_ACCOUNT_PATH
+        sync: false
+      - key: APPLE_SHARED_SECRET
+        sync: false
