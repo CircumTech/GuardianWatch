@@ -74,7 +74,9 @@ async function request<T>(
 export const api = {
   getProducts: () => request<Product[]>("/products"),
 
-  getProduct: (id: string) => request<Product>(`/products/${id}`),
+  // URL-encode path segments. `getProduct` was the only unencoded one.
+  getProduct: (id: string) =>
+    request<Product>(`/products/${encodeURIComponent(id)}`),
 
   lookupDevice: (id: string) =>
     request<DeviceLookup>(`/devices/lookup/${encodeURIComponent(id)}`),
@@ -181,4 +183,24 @@ export function formatMoney(cents: number, currency = "USD"): string {
 export function formatDate(iso: string | null | undefined): string {
   if (!iso) return "—";
   return new Date(iso).toLocaleString();
+}
+
+export function extractDetail(data: any, status: number): string {
+  // Do not surface stack traces or internal schema strings. Pydantic
+  // returns structured details; only the human-readable `msg` is
+  // exposed, and only for 4xx responses.
+  if (status < 500 && typeof data?.detail === "string") {
+    return data.detail;
+  }
+  if (status < 500 && Array.isArray(data?.detail)) {
+    return data.detail
+      .map((d: any) => (typeof d?.msg === "string" ? d.msg : null))
+      .filter(Boolean)
+      .join("; ") || "Please check your input.";
+  }
+  if (status === 401) return "Invalid credentials.";
+  if (status === 403) return "You don't have access to this.";
+  if (status === 404) return "Not found.";
+  if (status >= 500) return "Server error. Please try again.";
+  return `Request failed (${status}).`;
 }

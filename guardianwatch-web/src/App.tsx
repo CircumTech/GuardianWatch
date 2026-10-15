@@ -1,3 +1,4 @@
+import React from "react";
 import { Link, NavLink, Navigate, Route, Routes } from "react-router-dom";
 import { adminAuth } from "./auth";
 import Home from "./pages/Home.tsx";
@@ -6,8 +7,11 @@ import DeviceLookup from "./pages/DeviceLookup.tsx";
 import AdminLogin from "./pages/AdminLogin.tsx";
 import AdminDashboard from "./pages/AdminDashboard.tsx";
 
-function RequireAdmin({ children }: { children: React.ReactElement }) {
-  return adminAuth.getToken() ? children : <Navigate to="/admin/login" replace />;
+function RequireAdmin({ children }: { children: React.ReactNode }) {
+  if (!adminAuth.getToken()) {
+    return <Navigate to="/admin/login" replace />;
+  }
+  return <>{children}</>;
 }
 
 function Header() {
@@ -17,7 +21,7 @@ function Header() {
     }`;
 
   return (
-    <header className="border-b border-border bg-surface/60 backdrop-blur sticky top-0 z-10">
+    <header className="border-t-0 border-b border-border bg-surface/60 backdrop-blur sticky top-0 z-10">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-3">
         <Link to="/" className="flex items-center gap-2 text-base font-semibold">
           <span className="inline-block h-2 w-2 rounded-full bg-primary" />

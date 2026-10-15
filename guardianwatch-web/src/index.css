@@ -9,17 +9,33 @@
    ───────────────────────────────────────────────────────────────────── */
 
 @theme {
+  /* ── Surfaces ─────────────────────────────────────────────────── */
   --color-bg: #0a0e1a;
-  --color-surface: #141827;
-  --color-surface-hi: #1c2136;
-  --color-border: #232937;
-  --color-primary: #00b4d8;
-  --color-primary-hover: #0096b8;
-  --color-secondary: #0077b6;
-  --color-danger: #e63946;
+  --color-surface: #11151f;
+  --color-surface-2: #171b28;
+  --color-surface-3: #1e2333;
+  --color-border: #1e2333;
+  --color-border-strong: #2a3143;
 
-  --font-sans: system-ui, -apple-system, "Segoe UI", Roboto,
-    "Helvetica Neue", sans-serif;
+  /* ── Accent ───────────────────────────────────────────────────── */
+  --color-primary: #22d3ee;
+  --color-primary-hover: #06b6d4;
+  --color-primary-dim: #0e7490;
+
+  /* ── Text ─────────────────────────────────────────────────────── */
+  --color-fg: #f4f6fb;
+  --color-fg-muted: #a8b0c2;
+  --color-fg-dim: #6b7288;
+
+  /* ── Semantic ─────────────────────────────────────────────────── */
+  --color-success: #34d399;
+  --color-warning: #fbbf24;
+  --color-danger: #f87171;
+
+  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI",
+    Roboto, "Helvetica Neue", sans-serif;
+  --font-mono: ui-monospace, "SF Mono", "Cascadia Code", Menlo,
+    Consolas, monospace;
 }
 
 html,
@@ -30,44 +46,65 @@ body,
 
 body {
   background-color: var(--color-bg);
-  color: #e5e7eb;
-  -webkit-font-smoothing: antialiased;
+  background-image:
+    radial-gradient(
+      ellipse 80% 50% at 50% -20%,
+      rgb(34 211 238 / 0.08),
+      transparent
+    );
+  color: var(--color-fg);
   font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
 }
 
-/* ─────────────────────────────────────────────────────────────────────
-   Custom component classes.
+/* Numeric data reads better with tabular alignment. */
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
 
-   These are plain CSS, not `@utility`. v4's `@utility` directive only
-   accepts alphanumeric names and rejects pseudoclasses — `.btn-primary:hover`
-   would fail with "invalid utility name". Regular class selectors work in
-   every Tailwind version.
-   ───────────────────────────────────────────────────────────────────── */
+/* ── Custom utility classes (v4 plain CSS, no @apply) ──────────── */
+
+.card {
+  border-radius: 14px;
+  border: 1px solid var(--color-border);
+  background-color: var(--color-surface);
+  transition: border-color 0.15s ease-out, background-color 0.15s ease-out;
+}
+
+.card-interactive:hover {
+  border-color: var(--color-border-strong);
+  background-color: var(--color-surface-2);
+}
 
 .btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  border-radius: 0.5rem;
+  border-radius: 10px;
   padding: 0.5rem 1rem;
   font-size: 0.875rem;
   font-weight: 500;
-  transition:
-    background-color 0.15s,
-    color 0.15s,
-    border-color 0.15s,
-    opacity 0.15s;
+  line-height: 1.25rem;
+  letter-spacing: -0.005em;
   cursor: pointer;
+  transition:
+    background-color 0.15s ease-out,
+    border-color 0.15s ease-out,
+    color 0.15s ease-out,
+    opacity 0.15s ease-out;
+  white-space: nowrap;
 }
 .btn:disabled {
-  opacity: 0.5;
+  opacity: 0.4;
   cursor: not-allowed;
 }
 
 .btn-primary {
   background-color: var(--color-primary);
-  color: var(--color-bg);
+  color: #052e34;
 }
 .btn-primary:hover:not(:disabled) {
   background-color: var(--color-primary-hover);
@@ -75,53 +112,118 @@ body {
 
 .btn-ghost {
   border: 1px solid var(--color-border);
-  color: #d1d5db;
+  color: var(--color-fg-muted);
   background-color: transparent;
 }
 .btn-ghost:hover:not(:disabled) {
-  background-color: var(--color-surface-hi);
+  background-color: var(--color-surface-2);
+  border-color: var(--color-border-strong);
+  color: var(--color-fg);
 }
 
 .btn-danger {
-  background-color: rgb(230 57 70 / 0.1);
   color: var(--color-danger);
-  border: 1px solid rgb(230 57 70 / 0.3);
+  border: 1px solid color-mix(in srgb, var(--color-danger) 25%, transparent);
+  background-color: color-mix(in srgb, var(--color-danger) 8%, transparent);
 }
 .btn-danger:hover:not(:disabled) {
-  background-color: rgb(230 57 70 / 0.2);
+  background-color: color-mix(in srgb, var(--color-danger) 14%, transparent);
+}
+
+.btn-sm {
+  padding: 0.375rem 0.75rem;
+  font-size: 0.8125rem;
 }
 
 .input {
   width: 100%;
-  border-radius: 0.5rem;
+  border-radius: 10px;
   border: 1px solid var(--color-border);
   background-color: var(--color-bg);
-  padding: 0.5rem 0.75rem;
+  padding: 0.625rem 0.875rem;
   font-size: 0.875rem;
-  color: #f3f4f6;
+  color: var(--color-fg);
   outline: none;
-  transition: border-color 0.15s;
+  transition: border-color 0.15s ease-out, box-shadow 0.15s ease-out;
 }
 .input::placeholder {
-  color: #6b7280;
+  color: var(--color-fg-dim);
 }
 .input:focus {
   border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgb(34 211 238 / 0.12);
 }
 
 .label {
   display: block;
   font-size: 0.75rem;
   font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: #9ca3af;
-  margin-bottom: 0.375rem;
+  letter-spacing: 0.02em;
+  color: var(--color-fg-muted);
+  margin-bottom: 0.5rem;
 }
 
-.card {
-  border-radius: 0.75rem;
-  border: 1px solid var(--color-border);
-  background-color: var(--color-surface);
-  padding: 1.25rem;
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  border-radius: 999px;
+  padding: 0.25rem 0.625rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: -0.005em;
+}
+.pill-success {
+  background-color: color-mix(in srgb, var(--color-success) 12%, transparent);
+  color: var(--color-success);
+}
+.pill-warning {
+  background-color: color-mix(in srgb, var(--color-warning) 12%, transparent);
+  color: var(--color-warning);
+}
+.pill-danger {
+  background-color: color-mix(in srgb, var(--color-danger) 12%, transparent);
+  color: var(--color-danger);
+}
+.pill-neutral {
+  background-color: var(--color-surface-3);
+  color: var(--color-fg-muted);
+}
+.pill-primary {
+  background-color: color-mix(in srgb, var(--color-primary) 14%, transparent);
+  color: var(--color-primary);
+}
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--color-surface-2) 0%,
+    var(--color-surface-3) 50%,
+    var(--color-surface-2) 100%
+  );
+  background-size: 200% 100%;
+  animation: skeleton 1.6s ease-in-out infinite;
+  border-radius: 10px;
+}
+@keyframes skeleton {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+.fade-in {
+  animation: fadeIn 0.3s ease-out both;
+}
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
 }

@@ -2,8 +2,26 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Defense-in-depth against XSS. Inline styles are permitted
+         because Vite injects them; scripts are restricted to self. -->
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="
+        default-src 'self';
+        script-src 'self';
+        style-src 'self' 'unsafe-inline';
+        img-src 'self' data: blob:;
+        font-src 'self' data:;
+        connect-src 'self' http://localhost:8000 https://guardian-watch-api.onrender.com;
+        frame-ancestors 'none';
+        base-uri 'self';
+        form-action 'self';
+      "
+    />
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
+
     <title>Guardian Watch</title>
   </head>
   <body>
