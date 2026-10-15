@@ -7,7 +7,7 @@ email-validator>=2.2.0    # required for pydantic's EmailStr (order checkout)
 python-multipart>=0.0.12
 
 # ── Database ─────────────────────────────────────────────────────────────
-sqlalchemy>=2.0.35
+sqlalchemy[asyncio]>=2.0.0
 asyncpg>=0.29.0           # PostgreSQL (production)
 aiosqlite>=0.20.0         # SQLite (local dev — zero setup)
 alembic>=1.13.0
@@ -44,3 +44,4 @@ google-auth>=2.34.0       # Google Play Developer API (service-account signing)
 # ── Dev / test ───────────────────────────────────────────────────────────
 pytest>=8.3.0
 pytest-asyncio>=0.24.0
+greenlet>=3.0.0
