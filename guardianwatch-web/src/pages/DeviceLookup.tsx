@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { api, formatDate } from "../api";
 import type { DeviceLookup as Device } from "../types";
+import { EmptyState, ErrorBanner, Spinner } from "../components/ui";
 
 export default function DeviceLookup() {
   const [id, setId] = useState("");
@@ -8,14 +9,13 @@ export default function DeviceLookup() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
     setDevice(null);
     setLoading(true);
     try {
-      const d = await api.lookupDevice(id.trim().toUpperCase());
-      setDevice(d);
+      setDevice(await api.lookupDevice(id.trim().toUpperCase()));
     } catch (e: any) {
       setError(e.message || "Lookup failed");
     } finally {
@@ -24,91 +24,129 @@ export default function DeviceLookup() {
   };
 
   return (
-    <div className="space-y-8 max-w-2xl mx-auto">
-      <div className="space-y-2">
-        <h1 className="text-3xl font-semibold tracking-tight">
-          Look up your device
+    <div className="mx-auto max-w-2xl space-y-10 fade-in">
+      <div className="space-y-3">
+        <h1 className="text-3xl font-semibold tracking-tight text-fg">
+          Device lookup
         </h1>
-        <p className="text-gray-400 text-sm">
-          Enter the code printed under the strap to confirm it's genuine
-          and check warranty status.
+        <p className="text-sm text-fg-muted">
+          Enter the code printed under the strap to confirm authenticity and
+          check warranty status.
         </p>
       </div>
 
-      <form onSubmit={handleSubmit} className="flex gap-3">
+      <form onSubmit={submit} className="flex gap-3">
         <input
           value={id}
           onChange={(e) => setId(e.target.value)}
           placeholder="GW-XXXX-XXXX"
-          className="input font-mono tracking-wider"
+          className="input font-mono uppercase tracking-wider"
           autoFocus
           required
+          spellCheck={false}
         />
         <button
           type="submit"
           disabled={!id.trim() || loading}
           className="btn-primary shrink-0"
         >
-          {loading ? "Looking up…" : "Look up"}
+          {loading ? (
+            <>
+              <Spinner size={14} /> Looking up…
+            </>
+          ) : (
+            "Look up"
+          )}
         </button>
       </form>
 
-      {error && (
-        <div className="card border-danger/40 text-danger text-sm">
-          {error}
-        </div>
-      )}
+      {error && <ErrorBanner message={error} />}
 
-      {device && (
-        <div className="card space-y-4">
+      {device && !loading && (
+        <div className="card space-y-6 fade-in">
           <div className="flex items-start justify-between gap-4">
             <div>
-              <div className="text-xs uppercase tracking-wider text-gray-400 mb-1">
-                Device
+              <div className="text-xs font-medium uppercase tracking-wider text-fg-dim">
+                Device ID
               </div>
-              <div className="font-mono text-lg">{device.id}</div>
+              <div className="mt-1.5 font-mono text-xl text-fg">
+                {device.id}
+              </div>
             </div>
-            <div
-              className={`rounded-full px-3 py-1 text-xs font-medium ${
-                device.status === "registered"
-                  ? "bg-primary/10 text-primary"
-                  : device.status === "deactivated"
-                    ? "bg-danger/10 text-danger"
-                    : "bg-surfacehi text-gray-300"
-              }`}
-            >
-              {device.status}
-            </div>
+            {device.status === "registered" && (
+              <span className="pill pill-primary">Registered</span>
+            )}
+            {device.status === "unregistered" && (
+              <span className="pill pill-neutral">Unregistered</span>
+            )}
+            {device.status === "deactivated" && (
+              <span className="pill pill-danger">Deactivated</span>
+            )}
           </div>
 
-          <div className="border-t border-border pt-4 grid grid-cols-2 gap-4 text-sm">
-            <div>
-              <div className="text-gray-400 text-xs mb-1">Model</div>
-              <div>{device.product.name}</div>
-            </div>
-            <div>
-              <div className="text-gray-400 text-xs mb-1">Firmware</div>
-              <div>{device.firmware_version || "—"}</div>
-            </div>
-            <div>
-              <div className="text-gray-400 text-xs mb-1">Registered</div>
-              <div>{formatDate(device.registered_at)}</div>
-            </div>
-            <div>
-              <div className="text-gray-400 text-xs mb-1">Warranty</div>
-              <div
-                className={
-                  device.warranty_active ? "text-primary" : "text-gray-500"
-                }
-              >
-                {device.warranty_active
+          <dl className="grid grid-cols-2 gap-x-6 gap-y-5 border-t border-border pt-6">
+            <Field label="Model" value={device.product.name} />
+            <Field
+              label="Firmware"
+              value={device.firmware_version || "—"}
+              mono
+            />
+            <Field
+              label="Registered"
+              value={formatDate(device.registered_at)}
+            />
+            <Field
+              label="Warranty"
+              value={
+                device.warranty_active
                   ? `Active — ${device.warranty_months} months`
-                  : "Expired or inactive"}
-              </div>
-            </div>
-          </div>
+                  : "Expired or inactive"
+              }
+              tone={device.warranty_active ? "success" : "muted"}
+            />
+          </dl>
         </div>
       )}
+
+      {!device && !error && !loading && (
+        <div className="card">
+          <EmptyState
+            title="Enter a code to begin"
+            description="Device IDs are printed under the strap — they look like GW-A1B2-C3D4."
+          />
+        </div>
+      )}
+    </div>
+  );
+}
+
+function Field({
+  label,
+  value,
+  mono,
+  tone,
+}: {
+  label: string;
+  value: string;
+  mono?: boolean;
+  tone?: "success" | "muted";
+}) {
+  const valueClass =
+    tone === "success"
+      ? "text-success"
+      : tone === "muted"
+        ? "text-fg-dim"
+        : "text-fg";
+  return (
+    <div>
+      <dt className="text-xs font-medium uppercase tracking-wider text-fg-dim">
+        {label}
+      </dt>
+      <dd
+        className={`mt-1.5 text-sm ${valueClass} ${mono ? "font-mono" : ""}`}
+      >
+        {value}
+      </dd>
     </div>
   );
 }

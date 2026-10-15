@@ -1,34 +1,38 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  adminApi,
-  ApiError,
-  formatDate,
-  formatMoney,
-} from "../api";
+import { adminApi, ApiError, formatDate, formatMoney } from "../api";
 import { adminAuth } from "../auth";
-import type {
-  AdminDevice,
-  AdminProduct,
-  DashboardStats,
-  Order,
-} from "../types";
+import type { AdminDevice, AdminProduct, DashboardStats, Order } from "../types";
+import {
+  EmptyState,
+  ErrorBanner,
+  SectionHeader,
+  Skeleton,
+  Spinner,
+} from "../components/ui";
 
-type Tab = "stats" | "products" | "orders" | "devices";
+type Tab = "overview" | "products" | "orders" | "devices";
+
+const TABS: { id: Tab; label: string }[] = [
+  { id: "overview", label: "Overview" },
+  { id: "products", label: "Products" },
+  { id: "orders", label: "Orders" },
+  { id: "devices", label: "Devices" },
+];
 
 export default function AdminDashboard() {
-  const [tab, setTab] = useState<Tab>("stats");
+  const [tab, setTab] = useState<Tab>("overview");
   const [stats, setStats] = useState<DashboardStats | null>(null);
-  const [products, setProducts] = useState<AdminProduct[]>([]);
-  const [orders, setOrders] = useState<Order[]>([]);
-  const [devices, setDevices] = useState<AdminDevice[]>([]);
+  const [products, setProducts] = useState<AdminProduct[] | null>(null);
+  const [orders, setOrders] = useState<Order[] | null>(null);
+  const [devices, setDevices] = useState<AdminDevice[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
 
   const token = adminAuth.getToken()!;
   const user = adminAuth.getUser();
 
-  const handle401 = (e: unknown) => {
+  const handleError = (e: unknown) => {
     if (e instanceof ApiError && e.status === 401) {
       adminAuth.clear();
       navigate("/admin/login");
@@ -37,7 +41,7 @@ export default function AdminDashboard() {
     }
   };
 
-  const loadAll = async () => {
+  const reload = async () => {
     setError(null);
     try {
       const [s, p, o, d] = await Promise.all([
@@ -51,12 +55,12 @@ export default function AdminDashboard() {
       setOrders(o);
       setDevices(d);
     } catch (e) {
-      handle401(e);
+      handleError(e);
     }
   };
 
   useEffect(() => {
-    loadAll();
+    reload();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -66,84 +70,90 @@ export default function AdminDashboard() {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="space-y-8 fade-in">
+      <div className="flex items-end justify-between gap-6">
         <div>
-          <h1 className="text-2xl font-semibold">Admin</h1>
-          <p className="text-sm text-gray-400">
-            Signed in as {user?.email}
+          <h1 className="text-2xl font-semibold tracking-tight text-fg">
+            Admin
+          </h1>
+          <p className="mt-1 text-sm text-fg-muted">
+            Signed in as{" "}
+            <span className="text-fg">{user?.email ?? "unknown"}</span>
           </p>
         </div>
-        <button onClick={logout} className="btn-ghost">
+        <button onClick={logout} className="btn-ghost btn-sm">
           Sign out
         </button>
       </div>
 
       <nav className="flex gap-1 border-b border-border">
-        {(["stats", "products", "orders", "devices"] as Tab[]).map((t) => (
+        {TABS.map((t) => (
           <button
-            key={t}
-            onClick={() => setTab(t)}
-            className={`px-4 py-2 text-sm font-medium capitalize transition-colors border-b-2 -mb-px ${
-              tab === t
-                ? "border-primary text-primary"
-                : "border-transparent text-gray-400 hover:text-gray-200"
+            key={t.id}
+            onClick={() => setTab(t.id)}
+            className={`relative -mb-px border-b-2 px-4 py-2.5 text-sm font-medium transition-colors ${
+              tab === t.id
+                ? "border-primary text-fg"
+                : "border-transparent text-fg-muted hover:text-fg"
             }`}
           >
-            {t}
+            {t.label}
           </button>
         ))}
       </nav>
 
       {error && (
-        <div className="card border-danger/40 text-danger text-sm">
-          {error}
-        </div>
+        <ErrorBanner message={error} onDismiss={() => setError(null)} />
       )}
 
-      {tab === "stats" && <StatsTab stats={stats} />}
+      {tab === "overview" && <OverviewTab stats={stats} />}
       {tab === "products" && (
         <ProductsTab
           token={token}
           products={products}
-          onReload={loadAll}
-          onError={handle401}
+          onReload={reload}
+          onError={handleError}
         />
       )}
       {tab === "orders" && (
         <OrdersTab
           token={token}
           orders={orders}
-          onReload={loadAll}
-          onError={handle401}
+          onReload={reload}
+          onError={handleError}
         />
       )}
       {tab === "devices" && (
         <DevicesTab
           token={token}
           devices={devices}
-          onReload={loadAll}
-          onError={handle401}
+          onReload={reload}
+          onError={handleError}
         />
       )}
     </div>
   );
 }
 
-// ── Stats ────────────────────────────────────────────────────────────────
+// ── Overview ────────────────────────────────────────────────────────
 
-function StatsTab({ stats }: { stats: DashboardStats | null }) {
-  if (!stats) return <div className="text-sm text-gray-400">Loading…</div>;
+function OverviewTab({ stats }: { stats: DashboardStats | null }) {
+  if (!stats) {
+    return (
+      <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+        {Array.from({ length: 8 }).map((_, i) => (
+          <Skeleton key={i} className="h-24" />
+        ))}
+      </div>
+    );
+  }
 
   const cards = [
     { label: "Customers", value: stats.total_customers },
     { label: "Products", value: stats.total_products },
     { label: "Devices", value: stats.total_devices },
-    {
-      label: "Registered devices",
-      value: stats.devices_registered,
-    },
-    { label: "Total orders", value: stats.total_orders },
+    { label: "Registered", value: stats.devices_registered },
+    { label: "Orders", value: stats.total_orders },
     { label: "Pending", value: stats.orders_pending },
     { label: "Paid", value: stats.orders_paid },
     { label: "Fulfilled", value: stats.orders_fulfilled },
@@ -151,30 +161,33 @@ function StatsTab({ stats }: { stats: DashboardStats | null }) {
 
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        {cards.map((c) => (
-          <div key={c.label} className="card">
-            <div className="text-xs uppercase tracking-wider text-gray-400 mb-2">
-              {c.label}
-            </div>
-            <div className="text-2xl font-semibold">{c.value}</div>
-          </div>
-        ))}
-      </div>
-
-      <div className="card">
-        <div className="text-xs uppercase tracking-wider text-gray-400 mb-2">
+      <div className="card relative overflow-hidden p-6">
+        <div className="absolute inset-y-0 right-0 w-1/3 bg-[radial-gradient(closest-side,rgb(34_211_238_/_0.15),transparent)]" />
+        <div className="text-xs font-medium uppercase tracking-wider text-fg-dim">
           Revenue (paid + fulfilled)
         </div>
-        <div className="text-3xl font-semibold">
+        <div className="tabular mt-3 text-4xl font-semibold tracking-tight text-fg">
           {formatMoney(stats.revenue_paid_cents, stats.currency)}
         </div>
+      </div>
+
+      <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+        {cards.map((c) => (
+          <div key={c.label} className="card p-5">
+            <div className="text-xs font-medium uppercase tracking-wider text-fg-dim">
+              {c.label}
+            </div>
+            <div className="tabular mt-2 text-2xl font-semibold text-fg">
+              {c.value}
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   );
 }
 
-// ── Products ─────────────────────────────────────────────────────────────
+// ── Products ────────────────────────────────────────────────────────
 
 function ProductsTab({
   token,
@@ -183,7 +196,7 @@ function ProductsTab({
   onError,
 }: {
   token: string;
-  products: AdminProduct[];
+  products: AdminProduct[] | null;
   onReload: () => void;
   onError: (e: unknown) => void;
 }) {
@@ -220,16 +233,23 @@ function ProductsTab({
   };
 
   return (
-    <div className="space-y-4">
-      <div className="flex justify-end">
-        <button onClick={() => setCreating((v) => !v)} className="btn-primary">
-          {creating ? "Cancel" : "New product"}
-        </button>
-      </div>
+    <div className="space-y-6">
+      <SectionHeader
+        title="Products"
+        description="The storefront catalog."
+        action={
+          <button
+            onClick={() => setCreating((v) => !v)}
+            className={creating ? "btn-ghost btn-sm" : "btn-primary btn-sm"}
+          >
+            {creating ? "Cancel" : "New product"}
+          </button>
+        }
+      />
 
       {creating && (
-        <form onSubmit={submit} className="card space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <form onSubmit={submit} className="card space-y-5 p-6 fade-in">
+          <div className="grid gap-5 md:grid-cols-2">
             <div>
               <label className="label">Slug</label>
               <input
@@ -257,7 +277,7 @@ function ProductsTab({
                 onChange={(e) =>
                   setForm({ ...form, price_cents: Number(e.target.value) })
                 }
-                className="input"
+                className="input tabular"
                 min={0}
                 required
               />
@@ -270,7 +290,7 @@ function ProductsTab({
                 onChange={(e) =>
                   setForm({ ...form, stock_quantity: Number(e.target.value) })
                 }
-                className="input"
+                className="input tabular"
                 min={0}
                 required
               />
@@ -283,69 +303,84 @@ function ProductsTab({
               onChange={(e) =>
                 setForm({ ...form, description: e.target.value })
               }
-              className="input min-h-[80px]"
+              className="input min-h-[100px]"
               required
             />
           </div>
-          <button type="submit" className="btn-primary">
-            Create product
-          </button>
+          <div className="flex justify-end">
+            <button type="submit" className="btn-primary">
+              Create product
+            </button>
+          </div>
         </form>
       )}
 
-      <div className="card p-0 overflow-hidden">
-        <table className="w-full text-sm">
-          <thead className="bg-surfacehi text-gray-400 text-xs uppercase tracking-wider">
-            <tr>
-              <th className="text-left px-4 py-3">Slug</th>
-              <th className="text-left px-4 py-3">Name</th>
-              <th className="text-right px-4 py-3">Price</th>
-              <th className="text-right px-4 py-3">Stock</th>
-              <th className="text-center px-4 py-3">Status</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            {products.map((p) => (
-              <tr key={p.id} className="border-t border-border">
-                <td className="px-4 py-3 font-mono text-xs">{p.id}</td>
-                <td className="px-4 py-3">{p.name}</td>
-                <td className="px-4 py-3 text-right">
-                  {formatMoney(p.price_cents, p.currency)}
-                </td>
-                <td className="px-4 py-3 text-right">{p.stock_quantity}</td>
-                <td className="px-4 py-3 text-center">
-                  {p.active ? (
-                    <span className="text-primary">active</span>
-                  ) : (
-                    <span className="text-gray-500">inactive</span>
-                  )}
-                </td>
-                <td className="px-4 py-3 text-right">
-                  {p.active && (
-                    <button
-                      onClick={() => deactivate(p.id)}
-                      className="text-danger text-xs hover:underline"
-                    >
-                      Deactivate
-                    </button>
-                  )}
-                </td>
+      {!products ? (
+        <Skeleton className="h-64" />
+      ) : products.length === 0 ? (
+        <div className="card">
+          <EmptyState
+            title="No products yet"
+            description="Create your first product to populate the storefront."
+          />
+        </div>
+      ) : (
+        <div className="card overflow-hidden p-0">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-border bg-surface-2 text-left text-xs font-medium uppercase tracking-wider text-fg-dim">
+                <th className="px-5 py-3">Slug</th>
+                <th className="px-5 py-3">Name</th>
+                <th className="px-5 py-3 text-right">Price</th>
+                <th className="px-5 py-3 text-right">Stock</th>
+                <th className="px-5 py-3 text-center">Status</th>
+                <th className="px-5 py-3"></th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-        {products.length === 0 && (
-          <div className="p-8 text-center text-sm text-gray-400">
-            No products yet.
-          </div>
-        )}
-      </div>
+            </thead>
+            <tbody>
+              {products.map((p) => (
+                <tr
+                  key={p.id}
+                  className="border-b border-border last:border-b-0 transition-colors hover:bg-surface-2"
+                >
+                  <td className="px-5 py-3.5 font-mono text-xs text-fg-muted">
+                    {p.id}
+                  </td>
+                  <td className="px-5 py-3.5 text-fg">{p.name}</td>
+                  <td className="tabular px-5 py-3.5 text-right text-fg">
+                    {formatMoney(p.price_cents, p.currency)}
+                  </td>
+                  <td className="tabular px-5 py-3.5 text-right text-fg">
+                    {p.stock_quantity}
+                  </td>
+                  <td className="px-5 py-3.5 text-center">
+                    {p.active ? (
+                      <span className="pill pill-primary">Active</span>
+                    ) : (
+                      <span className="pill pill-neutral">Inactive</span>
+                    )}
+                  </td>
+                  <td className="px-5 py-3.5 text-right">
+                    {p.active && (
+                      <button
+                        onClick={() => deactivate(p.id)}
+                        className="text-xs font-medium text-fg-dim transition-colors hover:text-danger"
+                      >
+                        Deactivate
+                      </button>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   );
 }
 
-// ── Orders ───────────────────────────────────────────────────────────────
+// ── Orders ──────────────────────────────────────────────────────────
 
 function OrdersTab({
   token,
@@ -354,16 +389,18 @@ function OrdersTab({
   onError,
 }: {
   token: string;
-  orders: Order[];
+  orders: Order[] | null;
   onReload: () => void;
   onError: (e: unknown) => void;
 }) {
   const [filter, setFilter] = useState<Order["status"] | "all">("all");
+  const filtered = !orders
+    ? null
+    : filter === "all"
+      ? orders
+      : orders.filter((o) => o.status === filter);
 
-  const filtered =
-    filter === "all" ? orders : orders.filter((o) => o.status === filter);
-
-  const updateStatus = async (id: string, status: Order["status"]) => {
+  const update = async (id: string, status: Order["status"]) => {
     try {
       await adminApi.updateOrderStatus(token, id, status);
       onReload();
@@ -381,16 +418,18 @@ function OrdersTab({
   ];
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
+      <SectionHeader title="Orders" description="Filter and manage the queue." />
+
       <div className="flex gap-2">
         {statuses.map((s) => (
           <button
             key={s}
             onClick={() => setFilter(s)}
-            className={`rounded-full px-3 py-1 text-xs font-medium capitalize transition-colors ${
+            className={`rounded-full px-3.5 py-1.5 text-xs font-medium capitalize transition-colors ${
               filter === s
-                ? "bg-primary text-bg"
-                : "border border-border text-gray-400 hover:text-gray-200"
+                ? "bg-primary text-[#052e34]"
+                : "border border-border text-fg-muted hover:border-border-strong hover:text-fg"
             }`}
           >
             {s}
@@ -398,80 +437,91 @@ function OrdersTab({
         ))}
       </div>
 
-      <div className="card p-0 overflow-hidden">
-        <table className="w-full text-sm">
-          <thead className="bg-surfacehi text-gray-400 text-xs uppercase tracking-wider">
-            <tr>
-              <th className="text-left px-4 py-3">Order</th>
-              <th className="text-left px-4 py-3">Customer</th>
-              <th className="text-right px-4 py-3">Total</th>
-              <th className="text-center px-4 py-3">Status</th>
-              <th className="text-right px-4 py-3">Created</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            {filtered.map((o) => (
-              <tr key={o.id} className="border-t border-border">
-                <td className="px-4 py-3 font-mono text-xs">
-                  {o.id.slice(0, 8)}
-                </td>
-                <td className="px-4 py-3">
-                  <div>{o.customer_name}</div>
-                  <div className="text-xs text-gray-500">
-                    {o.customer_email}
-                  </div>
-                </td>
-                <td className="px-4 py-3 text-right">
-                  {formatMoney(o.total_cents, o.currency)}
-                </td>
-                <td className="px-4 py-3 text-center">
-                  <span
-                    className={`rounded-full px-2 py-0.5 text-xs ${
-                      o.status === "paid"
-                        ? "bg-primary/10 text-primary"
-                        : o.status === "fulfilled"
-                          ? "bg-primary/20 text-primary"
-                          : o.status === "cancelled"
-                            ? "bg-danger/10 text-danger"
-                            : "bg-surfacehi text-gray-300"
-                    }`}
-                  >
-                    {o.status}
-                  </span>
-                </td>
-                <td className="px-4 py-3 text-right text-xs text-gray-500">
-                  {formatDate(o.created_at)}
-                </td>
-                <td className="px-4 py-3 text-right">
-                  <select
-                    value={o.status}
-                    onChange={(e) =>
-                      updateStatus(o.id, e.target.value as Order["status"])
-                    }
-                    className="rounded border border-border bg-bg px-2 py-1 text-xs"
-                  >
-                    <option value="pending">pending</option>
-                    <option value="paid">paid</option>
-                    <option value="fulfilled">fulfilled</option>
-                    <option value="cancelled">cancelled</option>
-                  </select>
-                </td>
+      {!filtered ? (
+        <Skeleton className="h-64" />
+      ) : filtered.length === 0 ? (
+        <div className="card">
+          <EmptyState
+            title={
+              filter === "all"
+                ? "No orders yet"
+                : `No ${filter} orders`
+            }
+            description="Orders placed through the storefront will appear here."
+          />
+        </div>
+      ) : (
+        <div className="card overflow-hidden p-0">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-border bg-surface-2 text-left text-xs font-medium uppercase tracking-wider text-fg-dim">
+                <th className="px-5 py-3">Order</th>
+                <th className="px-5 py-3">Customer</th>
+                <th className="px-5 py-3 text-right">Total</th>
+                <th className="px-5 py-3 text-center">Status</th>
+                <th className="px-5 py-3 text-right">Created</th>
+                <th className="px-5 py-3"></th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-        {filtered.length === 0 && (
-          <div className="p-8 text-center text-sm text-gray-400">
-            No {filter === "all" ? "" : filter} orders.
-          </div>
-        )}
-      </div>
+            </thead>
+            <tbody>
+              {filtered.map((o) => (
+                <tr
+                  key={o.id}
+                  className="border-b border-border last:border-b-0 transition-colors hover:bg-surface-2"
+                >
+                  <td className="px-5 py-3.5 font-mono text-xs text-fg-muted">
+                    {o.id.slice(0, 8)}
+                  </td>
+                  <td className="px-5 py-3.5">
+                    <div className="text-fg">{o.customer_name}</div>
+                    <div className="text-xs text-fg-dim">
+                      {o.customer_email}
+                    </div>
+                  </td>
+                  <td className="tabular px-5 py-3.5 text-right text-fg">
+                    {formatMoney(o.total_cents, o.currency)}
+                  </td>
+                  <td className="px-5 py-3.5 text-center">
+                    <StatusPill status={o.status} />
+                  </td>
+                  <td className="px-5 py-3.5 text-right text-xs text-fg-dim">
+                    {formatDate(o.created_at)}
+                  </td>
+                  <td className="px-5 py-3.5 text-right">
+                    <select
+                      value={o.status}
+                      onChange={(e) =>
+                        update(o.id, e.target.value as Order["status"])
+                      }
+                      className="rounded-md border border-border bg-bg px-2 py-1 text-xs text-fg outline-none focus:border-primary"
+                    >
+                      <option value="pending">pending</option>
+                      <option value="paid">paid</option>
+                      <option value="fulfilled">fulfilled</option>
+                      <option value="cancelled">cancelled</option>
+                    </select>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   );
 }
 
-// ── Devices ──────────────────────────────────────────────────────────────
+function StatusPill({ status }: { status: Order["status"] }) {
+  const map: Record<Order["status"], string> = {
+    pending: "pill-neutral",
+    paid: "pill-primary",
+    fulfilled: "pill-success",
+    cancelled: "pill-danger",
+  };
+  return <span className={`pill ${map[status]}`}>{status}</span>;
+}
+
+// ── Devices ─────────────────────────────────────────────────────────
 
 function DevicesTab({
   token,
@@ -480,21 +530,25 @@ function DevicesTab({
   onError,
 }: {
   token: string;
-  devices: AdminDevice[];
+  devices: AdminDevice[] | null;
   onReload: () => void;
   onError: (e: unknown) => void;
 }) {
   const [provisioning, setProvisioning] = useState(false);
   const [form, setForm] = useState({ product_id: "", quantity: 5 });
+  const [submitting, setSubmitting] = useState(false);
 
   const provision = async (e: React.FormEvent) => {
     e.preventDefault();
+    setSubmitting(true);
     try {
       await adminApi.provisionDevices(token, form);
       setProvisioning(false);
       onReload();
     } catch (e) {
       onError(e);
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -513,25 +567,29 @@ function DevicesTab({
   };
 
   const productIds = Array.from(
-    new Set(devices.map((d) => d.product.id)),
+    new Set(devices?.map((d) => d.product.id) ?? []),
   );
 
   return (
-    <div className="space-y-4">
-      <div className="flex justify-end">
-        <button
-          onClick={() => setProvisioning((v) => !v)}
-          className="btn-primary"
-        >
-          {provisioning ? "Cancel" : "Provision devices"}
-        </button>
-      </div>
+    <div className="space-y-6">
+      <SectionHeader
+        title="Devices"
+        description="Provision and manage physical units."
+        action={
+          <button
+            onClick={() => setProvisioning((v) => !v)}
+            className={provisioning ? "btn-ghost btn-sm" : "btn-primary btn-sm"}
+          >
+            {provisioning ? "Cancel" : "Provision"}
+          </button>
+        }
+      />
 
       {provisioning && (
-        <form onSubmit={provision} className="card space-y-4">
-          <div className="grid grid-cols-2 gap-4">
+        <form onSubmit={provision} className="card space-y-5 p-6 fade-in">
+          <div className="grid gap-5 md:grid-cols-2">
             <div>
-              <label className="label">Product</label>
+              <label className="label">Product slug</label>
               <input
                 list="product-ids"
                 value={form.product_id}
@@ -548,92 +606,107 @@ function DevicesTab({
               </datalist>
             </div>
             <div>
-              <label className="label">Quantity (1-500)</label>
+              <label className="label">Quantity (1–500)</label>
               <input
                 type="number"
                 value={form.quantity}
                 onChange={(e) =>
                   setForm({ ...form, quantity: Number(e.target.value) })
                 }
-                className="input"
+                className="input tabular"
                 min={1}
                 max={500}
                 required
               />
             </div>
           </div>
-          <button type="submit" className="btn-primary">
-            Provision
-          </button>
+          <div className="flex justify-end">
+            <button
+              type="submit"
+              disabled={submitting}
+              className="btn-primary"
+            >
+              {submitting ? (
+                <>
+                  <Spinner size={14} /> Provisioning…
+                </>
+              ) : (
+                "Provision devices"
+              )}
+            </button>
+          </div>
         </form>
       )}
 
-      <div className="card p-0 overflow-hidden">
-        <table className="w-full text-sm">
-          <thead className="bg-surfacehi text-gray-400 text-xs uppercase tracking-wider">
-            <tr>
-              <th className="text-left px-4 py-3">ID</th>
-              <th className="text-left px-4 py-3">Product</th>
-              <th className="text-left px-4 py-3">Owner</th>
-              <th className="text-center px-4 py-3">Status</th>
-              <th className="text-right px-4 py-3">Manufactured</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            {devices.map((d) => (
-              <tr key={d.id} className="border-t border-border">
-                <td className="px-4 py-3 font-mono text-xs">{d.id}</td>
-                <td className="px-4 py-3 text-xs text-gray-400">
-                  {d.product.id}
-                </td>
-                <td className="px-4 py-3 text-xs">
-                  {d.owner_email || (
-                    <span className="text-gray-500">—</span>
-                  )}
-                </td>
-                <td className="px-4 py-3 text-center">
-                  <span
-                    className={`rounded-full px-2 py-0.5 text-xs ${
-                      d.status === "registered"
-                        ? "bg-primary/10 text-primary"
-                        : d.status === "deactivated"
-                          ? "bg-danger/10 text-danger"
-                          : "bg-surfacehi text-gray-300"
-                    }`}
-                  >
-                    {d.status}
-                  </span>
-                </td>
-                <td className="px-4 py-3 text-right text-xs text-gray-500">
-                  {formatDate(d.manufactured_at)}
-                </td>
-                <td className="px-4 py-3 text-right">
-                  <button
-                    onClick={() => toggle(d)}
-                    className={`text-xs hover:underline ${
-                      d.status === "deactivated"
-                        ? "text-primary"
-                        : "text-danger"
-                    }`}
-                  >
-                    {d.status === "deactivated" ? "Reactivate" : "Deactivate"}
-                  </button>
-                </td>
+      {!devices ? (
+        <Skeleton className="h-64" />
+      ) : devices.length === 0 ? (
+        <div className="card">
+          <EmptyState
+            title="No devices provisioned"
+            description="Provision physical units here or run python scripts/seed_shop_data.py."
+          />
+        </div>
+      ) : (
+        <div className="card overflow-hidden p-0">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-border bg-surface-2 text-left text-xs font-medium uppercase tracking-wider text-fg-dim">
+                <th className="px-5 py-3">ID</th>
+                <th className="px-5 py-3">Product</th>
+                <th className="px-5 py-3">Owner</th>
+                <th className="px-5 py-3 text-center">Status</th>
+                <th className="px-5 py-3 text-right">Manufactured</th>
+                <th className="px-5 py-3"></th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-        {devices.length === 0 && (
-          <div className="p-8 text-center text-sm text-gray-400">
-            No devices provisioned. Run{" "}
-            <code className="text-gray-200">
-              python scripts/seed_shop_data.py
-            </code>{" "}
-            or use the button above.
-          </div>
-        )}
-      </div>
+            </thead>
+            <tbody>
+              {devices.map((d) => (
+                <tr
+                  key={d.id}
+                  className="border-b border-border last:border-b-0 transition-colors hover:bg-surface-2"
+                >
+                  <td className="px-5 py-3.5 font-mono text-xs text-fg">
+                    {d.id}
+                  </td>
+                  <td className="px-5 py-3.5 font-mono text-xs text-fg-muted">
+                    {d.product.id}
+                  </td>
+                  <td className="px-5 py-3.5 text-xs text-fg-muted">
+                    {d.owner_email || "—"}
+                  </td>
+                  <td className="px-5 py-3.5 text-center">
+                    {d.status === "registered" && (
+                      <span className="pill pill-primary">Registered</span>
+                    )}
+                    {d.status === "unregistered" && (
+                      <span className="pill pill-neutral">Unregistered</span>
+                    )}
+                    {d.status === "deactivated" && (
+                      <span className="pill pill-danger">Deactivated</span>
+                    )}
+                  </td>
+                  <td className="px-5 py-3.5 text-right text-xs text-fg-dim">
+                    {formatDate(d.manufactured_at)}
+                  </td>
+                  <td className="px-5 py-3.5 text-right">
+                    <button
+                      onClick={() => toggle(d)}
+                      className={`text-xs font-medium transition-colors ${
+                        d.status === "deactivated"
+                          ? "text-fg-muted hover:text-primary"
+                          : "text-fg-muted hover:text-danger"
+                      }`}
+                    >
+                      {d.status === "deactivated" ? "Reactivate" : "Deactivate"}
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   );
 }

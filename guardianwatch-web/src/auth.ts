@@ -1,23 +1,32 @@
+import type { AdminUser } from "./types";
+
 const TOKEN_KEY = "gw_admin_token";
 const USER_KEY = "gw_admin_user";
 
-import type { AdminUser } from "./types";
-
+// sessionStorage: token lifetime is bounded by the browser tab.
+// Closing the tab ends the session. XSS can still read it while the
+// tab is open, but the exposure window is far smaller than
+// localStorage's indefinite persistence.
 export const adminAuth = {
-  getToken: () => localStorage.getItem(TOKEN_KEY),
+  getToken: () => sessionStorage.getItem(TOKEN_KEY),
 
   getUser: (): AdminUser | null => {
-    const raw = localStorage.getItem(USER_KEY);
-    return raw ? JSON.parse(raw) : null;
+    const raw = sessionStorage.getItem(USER_KEY);
+    if (!raw) return null;
+    try {
+      return JSON.parse(raw);
+    } catch {
+      return null;
+    }
   },
 
   set: (token: string, user: AdminUser) => {
-    localStorage.setItem(TOKEN_KEY, token);
-    localStorage.setItem(USER_KEY, JSON.stringify(user));
+    sessionStorage.setItem(TOKEN_KEY, token);
+    sessionStorage.setItem(USER_KEY, JSON.stringify(user));
   },
 
   clear: () => {
-    localStorage.removeItem(TOKEN_KEY);
-    localStorage.removeItem(USER_KEY);
+    sessionStorage.removeItem(TOKEN_KEY);
+    sessionStorage.removeItem(USER_KEY);
   },
 };
