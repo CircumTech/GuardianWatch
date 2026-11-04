@@ -9,7 +9,7 @@ import type {
 } from "./types";
 
 const BASE_URL =
-  (import.meta.env.VITE_API_URL as string) || "http://localhost:8000";
+  (import.meta.env.VITE_API_URL as string) || "https://guardianwatch-aeny.onrender.com";
 
 // ── Error handling ────────────────────────────────────────────────────────
 
